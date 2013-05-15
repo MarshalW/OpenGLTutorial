@@ -3,6 +3,7 @@ package com.example.opengl;
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -29,9 +30,11 @@ public class MyActivity extends Activity {
 
             @Override
             public void onDrawFrame(GL10 gl10) {
-                //TODO 绘制一次界面（帧）
+                Log.d("OpenGLTutorial", ">>>>on draw frame");
             }
         });
+
+        surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         setContentView(surfaceView);
     }
 }
