@@ -32,5 +32,6 @@ public class MyActivity extends Activity {
                 //TODO 绘制一次界面（帧）
             }
         });
+        setContentView(surfaceView);
     }
 }
