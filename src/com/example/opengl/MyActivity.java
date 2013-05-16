@@ -1,12 +1,15 @@
 package com.example.opengl;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+
+import static android.opengl.GLES20.*;
 
 public class MyActivity extends Activity {
     /**
@@ -20,7 +23,8 @@ public class MyActivity extends Activity {
         surfaceView.setRenderer(new GLSurfaceView.Renderer() {
             @Override
             public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
-                //TODO 创建时调用
+                int color = Color.BLUE;
+                glClearColor(Color.red(color), Color.green(color), Color.blue(color), 1);
             }
 
             @Override
@@ -31,6 +35,7 @@ public class MyActivity extends Activity {
             @Override
             public void onDrawFrame(GL10 gl10) {
                 Log.d("OpenGLTutorial", ">>>>on draw frame");
+                glClear(GL_COLOR_BUFFER_BIT);
             }
         });
 
