@@ -26,7 +26,7 @@ public class Mesh {
         shader = new Shader();
         shader.setProgram(context, R.raw.vertexes, R.raw.fragment);
 
-        vertexBuffer = ByteBuffer.allocateDirect(3 * 4 * 3).
+        vertexBuffer = ByteBuffer.allocateDirect(3 * 4 * 4).
                 order(ByteOrder.nativeOrder()).asFloatBuffer();
     }
 
@@ -45,7 +45,7 @@ public class Mesh {
         glEnableVertexAttribArray(aPosition);
 
         //绘制三角形
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
     /**
@@ -66,7 +66,8 @@ public class Mesh {
         return new float[]{
                 -0.5f, 0.5f, 0,
                 -0.5f, -0.5f, 0,
-                0.5f, -0.5f, 0
+                0.5f, 0.5f, 0,
+                0.5f, -0.5f,0
         };
     }
 }
