@@ -83,8 +83,6 @@ public class Mesh {
     }
 
     public void draw(float[] projectionMatrix) {
-        setVertexBuffer();
-
         this.shader.useProgram();
 
         glUniformMatrix4fv(shader.getHandle("projectionMatrix"), 1, false, projectionMatrix, 0);
@@ -106,24 +104,9 @@ public class Mesh {
     /**
      * 设置顶点缓冲
      */
-    private void setVertexBuffer() {
+    public  void setVertexBuffer(float[] vertexes) {
         vertexBuffer.clear();
-        vertexBuffer.put(createTriangleVertexes());
+        vertexBuffer.put(vertexes);
         vertexBuffer.position(0);
-    }
-
-    /**
-     * 创建一个三角形的各顶点坐标
-     *
-     * @return
-     */
-    private float[] createTriangleVertexes() {
-        return
-                new float[]{
-                        -0.5f, 0.5f, 0,
-                        -0.5f, -0.5f, 0,
-                        0.5f, 0.5f, 0,
-                        0.5f, -0.5f, 0
-                };
     }
 }
