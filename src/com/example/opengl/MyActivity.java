@@ -1,6 +1,7 @@
 package com.example.opengl;
 
 import android.app.Activity;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -20,7 +21,7 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
 
     private float ratio;
 
-    private float[] projectionMatrix=new float[16];
+    private float[] projectionMatrix = new float[16];
 
     /**
      * Called when the activity is first created.
@@ -41,7 +42,8 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         glClearColor(0, 0, 0, 0);
-        mesh=new Mesh(this);
+        mesh = new Mesh(this);
+        mesh.loadTexture(BitmapFactory.decodeResource(getResources(), R.drawable.h));
     }
 
     @Override
