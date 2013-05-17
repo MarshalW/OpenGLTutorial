@@ -3,6 +3,7 @@ package com.example.opengl;
 import android.app.Activity;
 import android.graphics.Color;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -16,6 +17,10 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
     private GLSurfaceView surfaceView;
 
     private Mesh mesh;
+
+    private float ratio;
+
+    private float[] projectionMatrix=new float[16];
 
     /**
      * Called when the activity is first created.
@@ -42,11 +47,13 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
         glViewport(0, 0, width, height);
+        ratio = width / (float) height;
+        Matrix.orthoM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, -10f, 10f);
     }
 
     @Override
     public void onDrawFrame(GL10 gl10) {
         glClear(GL_COLOR_BUFFER_BIT);
-        mesh.draw();
+        mesh.draw(projectionMatrix);
     }
 }

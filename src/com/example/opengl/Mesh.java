@@ -26,13 +26,16 @@ public class Mesh {
         shader = new Shader();
         shader.setProgram(context, R.raw.vertexes, R.raw.fragment);
 
-        vertexBuffer = ByteBuffer.allocateDirect(3 * 4 * 3).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        vertexBuffer = ByteBuffer.allocateDirect(3 * 4 * 3).
+                order(ByteOrder.nativeOrder()).asFloatBuffer();
     }
 
-    public void draw() {
+    public void draw(float[] projectionMatrix) {
         setVertexBuffer();
 
         this.shader.useProgram();
+
+        glUniformMatrix4fv(shader.getHandle("projectionMatrix"), 1, false, projectionMatrix, 0);
 
         //获取shader的aPosition变量“指针”
         int aPosition = this.shader.getHandle("aPosition");
@@ -48,7 +51,7 @@ public class Mesh {
     /**
      * 设置顶点缓冲
      */
-    private void setVertexBuffer(){
+    private void setVertexBuffer() {
         vertexBuffer.clear();
         vertexBuffer.put(createTriangleVertexes());
         vertexBuffer.position(0);
@@ -56,6 +59,7 @@ public class Mesh {
 
     /**
      * 创建一个三角形的各顶点坐标
+     *
      * @return
      */
     private float[] createTriangleVertexes() {
