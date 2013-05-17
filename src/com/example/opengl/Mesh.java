@@ -78,6 +78,8 @@ public class Mesh {
         glEnable(GL_TEXTURE_2D);
         GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
         glDisable(GL_TEXTURE_2D);
+
+        bitmap.recycle();
     }
 
     public void draw(float[] projectionMatrix) {
