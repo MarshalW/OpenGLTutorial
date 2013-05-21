@@ -1,14 +1,17 @@
 package com.example.opengl;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -21,9 +24,17 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
 
     private Mesh mesh;
 
-    private float ratio, factor;
+    private float ratio;
 
     private float[] projectionMatrix = new float[16];
+
+    private View targetView;
+
+    private ViewGroup rootView;
+
+    private long duration = 1000;
+
+    private boolean startAnimation;
 
     /**
      * Called when the activity is first created.
@@ -31,30 +42,37 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        targetView = findViewById(R.id.targetView);
+        rootView = (ViewGroup) findViewById(R.id.rootView);
+
+        ImageView view = (ImageView) targetView;
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startAnimation();
+            }
+        });
 
         surfaceView = new GLSurfaceView(this);
-        //设置使用opengl es2，默认是1.x
         surfaceView.setEGLContextClientVersion(2);
+
+        //设置背景透明
+        surfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+        surfaceView.setZOrderOnTop(true);
+        surfaceView.getHolder().setFormat(PixelFormat.TRANSPARENT);
+
         surfaceView.setRenderer(this);
-
         surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        setContentView(surfaceView);
 
-        new Handler().postDelayed(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        startAnimation();
-                    }
-                }
-                , 2000);
+        rootView.addView(surfaceView);
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         glClearColor(0, 0, 0, 0);
         mesh = new Mesh(this);
-        mesh.loadTexture(BitmapFactory.decodeResource(getResources(), R.drawable.h));
     }
 
     @Override
@@ -67,42 +85,73 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl10) {
         glClear(GL_COLOR_BUFFER_BIT);
-        mesh.draw(projectionMatrix);
+        if(startAnimation){
+            mesh.draw(projectionMatrix);
+        }
     }
 
-    public void startAnimation() {
-        ValueAnimator animator = ValueAnimator.ofFloat(-1, 1);
-        animator.setDuration(1500);
-
+    private void startAnimation() {
+        startAnimation = true;
+        ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+        animator.setDuration(duration);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                final float factor = (Float) valueAnimator.getAnimatedValue();
                 surfaceView.queueEvent(new Runnable() {
                     @Override
                     public void run() {
-                        MyActivity.this.factor = factor;
                         mesh.setVertexBuffer(createVertexes());
                         surfaceView.requestRender();
                     }
                 });
             }
         });
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                targetView.setVisibility(View.INVISIBLE);
+            }
 
-        animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.setRepeatMode(ValueAnimator.REVERSE);
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                targetView.setVisibility(View.VISIBLE);
+                startAnimation = false;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+                targetView.setVisibility(View.VISIBLE);
+                startAnimation = false;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+            }
+        });
+
+        //创建视图的截图
+        rootView.setDrawingCacheEnabled(true);
+        final Bitmap bitmap = Bitmap.createBitmap(rootView.getDrawingCache());
+        rootView.setDrawingCacheEnabled(false);
+
+        surfaceView.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                mesh.loadTexture(bitmap);
+                bitmap.recycle();
+            }
+        });
+
         animator.start();
     }
 
     private float[] createVertexes() {
-        float moveX = 0.2f*factor;
-        float[] vertexes =
-                new float[]{
-                        -0.5f + moveX, 0.5f, 0,
-                        -0.5f + moveX, -0.5f, 0,
-                        0.5f + moveX, 0.5f, 0,
-                        0.5f + moveX, -0.5f, 0
-                };
-        return vertexes;
+        return new float[]{
+                -ratio, 1, 0,
+                -ratio, -1, 0,
+                ratio, 1, 0,
+                ratio, -1, 0
+        };
     }
+
 }

@@ -3,6 +3,7 @@ package com.example.opengl;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
+import android.os.Handler;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -45,7 +46,6 @@ public class Mesh {
     }
 
     public void loadTexture(Bitmap texture) {
-        Bitmap bitmap = Bitmap.createBitmap(texture);
 
         if (textureId == null) {
             //创建纹理指针
@@ -76,10 +76,8 @@ public class Mesh {
 
         //加入纹理
         glEnable(GL_TEXTURE_2D);
-        GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
+        GLUtils.texImage2D(GL_TEXTURE_2D, 0, texture, 0);
         glDisable(GL_TEXTURE_2D);
-
-        bitmap.recycle();
     }
 
     public void draw(float[] projectionMatrix) {
@@ -104,7 +102,7 @@ public class Mesh {
     /**
      * 设置顶点缓冲
      */
-    public  void setVertexBuffer(float[] vertexes) {
+    public void setVertexBuffer(float[] vertexes) {
         vertexBuffer.clear();
         vertexBuffer.put(vertexes);
         vertexBuffer.position(0);
