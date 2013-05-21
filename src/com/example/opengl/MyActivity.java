@@ -85,7 +85,7 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl10) {
         glClear(GL_COLOR_BUFFER_BIT);
-        if(startAnimation){
+        if (startAnimation) {
             mesh.draw(projectionMatrix);
         }
     }
@@ -109,7 +109,15 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
         animator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
-                targetView.setVisibility(View.INVISIBLE);
+                //延时防止闪动
+                targetView.getHandler().postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                targetView.setVisibility(View.INVISIBLE);
+                            }
+                        }
+                        , 100);
             }
 
             @Override
@@ -131,14 +139,17 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
 
         //创建视图的截图
         rootView.setDrawingCacheEnabled(true);
-        final Bitmap bitmap = Bitmap.createBitmap(rootView.getDrawingCache());
+        Bitmap bitmap = rootView.getDrawingCache();
+        final Bitmap texture = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth() / 2,
+                bitmap.getHeight());
+
         rootView.setDrawingCacheEnabled(false);
 
         surfaceView.queueEvent(new Runnable() {
             @Override
             public void run() {
-                mesh.loadTexture(bitmap);
-                bitmap.recycle();
+                mesh.loadTexture(texture);
+                texture.recycle();
             }
         });
 
@@ -149,8 +160,8 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
         return new float[]{
                 -ratio, 1, 0,
                 -ratio, -1, 0,
-                ratio, 1, 0,
-                ratio, -1, 0
+                0, 1, 0,
+                0, -1, 0
         };
     }
 
