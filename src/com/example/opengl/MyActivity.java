@@ -89,9 +89,9 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
         float lookZ = -1.0f;
 
         //照相机的垂直方向
-        float upX = 0.0f;
-        float upY = 1.0f;
-        float upZ = 0.0f;
+        float upX = 0f;
+        float upY = 1f;
+        float upZ = 0f;
 
         Matrix.setLookAtM(viewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
@@ -115,20 +115,31 @@ public class MyActivity extends Activity implements GLSurfaceView.Renderer {
         float near = 7;
         float far = 100;
         Matrix.frustumM(projectionMatrix, 0, left, right, bottom, top, near, far);
-
-        mesh.setVertexBuffer(new float[]{
-                -ratio, 1, 0,
-                -ratio, -1, 0,
-                ratio, 1, 0,
-                ratio, -1, 0
-        });
     }
 
     @Override
     public void onDrawFrame(GL10 gl10) {
         glClear(GL_COLOR_BUFFER_BIT);
 
+        float[] vertexes = new float[]{
+                -ratio, 1, 0,
+                -ratio, -1, 0,
+                ratio, 1, 0,
+                ratio, -1, 0
+        };
+
+//        for (int i = 0; i < vertexes.length; i += 3) {
+//            vertexes[i] += ratio;
+//        }
+
+        mesh.setVertexBuffer(vertexes);
+
         Matrix.setIdentityM(modelMatrix, 0);
+
+        Matrix.translateM(modelMatrix, 0, -ratio, 0, 0f);
+        Matrix.rotateM(modelMatrix, 0, 40, 0, 1, 0);
+        Matrix.translateM(modelMatrix, 0, ratio, 0, 0);
+
         Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
         Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
 
